@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.yanzhenjie.statusview.StatusView
+        android:id="@+id/status_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#78CDD0"
+        app:fitsView="@+id/root_layout" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/y25"
+        android:background="#78CDD0">
+
+
+        <RelativeLayout
+            android:id="@+id/area_rel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:paddingLeft="@dimen/x10"
+            android:paddingRight="@dimen/x10">
+
+            <TextView
+                android:id="@+id/area_name_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:gravity="bottom"
+                android:paddingBottom="@dimen/y5"
+                android:text="空调新风集控系统"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/area_name_txt"
+                android:layout_marginLeft="@dimen/x5"
+                android:layout_toRightOf="@+id/area_name_txt"
+                android:gravity="center"
+                android:paddingBottom="@dimen/y5"
+                android:text="Pad控制器v1.0"
+                android:textColor="@color/white"
+                android:textSize="10sp" />
+        </RelativeLayout>
+
+
+        <!--<ImageView-->
+        <!--android:id="@+id/add_device"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:layout_marginRight="@dimen/x8"-->
+        <!--android:paddingLeft="@dimen/x8"-->
+        <!--app:srcCompat="@drawable/icon_plus" />-->
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.2"
+            android:background="@color/dark_main"
+            android:orientation="vertical">
+
+
+                    <LinearLayout
+                        android:id="@+id/layout_sort1"
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="left"
+                        android:background="@color/dark_main"
+                        android:gravity="left"
+                        android:orientation="vertical">
+                        <ListView
+                            android:id="@+id/home_listview"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/y10"
+                            android:choiceMode="singleChoice"
+                            android:divider="@null">
+
+                        </ListView>
+
+
+                    </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.8"
+            android:background="#F6F7FA">
+            <!--<com.massky.sraumsmarthome.view.DragGridView-->
+            <!--android:id="@+id/dragGridView"-->
+            <!--android:listSelector="@android:color/transparent"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:cacheColorHint="@android:color/transparent"-->
+            <!--android:verticalSpacing="@dimen/x10"-->
+            <!--android:horizontalSpacing="@dimen/x10"-->
+            <!--android:stretchMode="columnWidth"-->
+            <!--android:gravity="center"-->
+            <!--android:numColumns="2"></com.massky.sraumsmarthome.view.DragGridView>-->
+
+            <com.andview.refreshview.XRefreshView
+                android:id="@+id/refresh_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <GridView
+                    android:id="@+id/dragGridView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/x7"
+                    android:cacheColorHint="@android:color/transparent"
+                    android:gravity="center"
+                    android:horizontalSpacing="@dimen/x7"
+                    android:listSelector="@android:color/transparent"
+                    android:numColumns="3"
+                    android:stretchMode="columnWidth"
+                    android:verticalSpacing="@dimen/y5" />
+            </com.andview.refreshview.XRefreshView>
+        </LinearLayout>
+    </LinearLayout>
+
+
+</LinearLayout>

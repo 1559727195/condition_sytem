@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/root_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#78CDD0"
+        android:orientation="vertical">
+
+
+    <com.yanzhenjie.statusview.StatusView
+        android:id="@+id/status_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:fitsView="@+id/root_layout" />
+
+    <!--<include-->
+    <!--layout="@layout/toolbar_lay"-->
+    <!--android:visibility="gone" />-->
+
+    <!--<ImageView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center_horizontal"-->
+    <!--android:layout_marginTop="50dp"-->
+    <!--android:src="@mipmap/ic_launcher" />-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/y15"
+        android:text="空调新风集控系统"
+        android:textColor="#f6f7f8"
+        android:textSize="28sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/y5"
+        android:text="Pad控制器"
+        android:textColor="#f6f7f8"
+        android:textSize="12sp" />
+
+    <androidx.percentlayout.widget.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/y15"
+        app:layout_widthPercent="40%">
+
+        <androidx.percentlayout.widget.PercentRelativeLayout
+            android:id="@+id/login_per_lay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/edit_gateway_shape"
+            app:layout_widthPercent="40%">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/x2"
+                android:src="@drawable/icon_user" />
+
+            <com.massky.conditioningsystem.view.ClearEditText
+                android:id="@+id/usertext_id"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerInParent="true"
+                android:background="@null"
+                android:gravity="left"
+                android:hint="账号"
+                android:inputType="text"
+                android:paddingLeft="@dimen/x5"
+                android:paddingTop="@dimen/y8"
+                android:paddingBottom="@dimen/y8"
+                android:textColor="#a7a7a7"
+                android:textColorHint="#a7a7a7"
+                app:layout_widthPercent="70%" />
+
+            <!--<TextView-->
+            <!--android:id="@+id/scan_gateway"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:gravity="left"-->
+            <!--android:text="扫一扫"-->
+            <!--android:textColor="@color/gray"-->
+            <!--android:textSize="12sp"-->
+            <!--android:visibility="gone" />-->
+        </androidx.percentlayout.widget.PercentRelativeLayout>
+
+
+    </androidx.percentlayout.widget.PercentRelativeLayout>
+
+    <androidx.percentlayout.widget.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        app:layout_widthPercent="40%">
+
+        <androidx.percentlayout.widget.PercentRelativeLayout
+            android:id="@+id/per_rel_pass_lay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/edit_gateway_shape"
+            app:layout_widthPercent="40%">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/x2"
+                android:src="@drawable/icon_mima" />
+
+            <com.massky.conditioningsystem.view.ClearEditText
+                android:id="@+id/phonepassword"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerInParent="true"
+                android:background="@null"
+                android:gravity="left"
+                android:hint="密码"
+                android:inputType="textPassword"
+                android:paddingLeft="@dimen/x5"
+                android:paddingTop="@dimen/y8"
+                android:paddingRight="10dp"
+                android:paddingBottom="@dimen/y8"
+                android:textColor="#a7a7a7"
+                android:textColorHint="#a7a7a7"
+                app:layout_widthPercent="70%" />
+
+            <ImageView
+                android:id="@+id/eyeimageview_id_gateway"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:visibility="gone"
+                app:srcCompat="@mipmap/eyeclose" />
+
+        </androidx.percentlayout.widget.PercentRelativeLayout>
+
+    </androidx.percentlayout.widget.PercentRelativeLayout>
+
+    <androidx.percentlayout.widget.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/y18">
+
+        <Button
+            android:id="@+id/btn_login_gateway"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/btn_login"
+            app:layout_widthPercent="40%" />
+
+    </androidx.percentlayout.widget.PercentRelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/search_gateway_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/y20"
+            android:text="设置服务器IP"
+            android:textColor="#f6f7f8"
+            android:textSize="12sp" />
+    </RelativeLayout>
+    </LinearLayout>
+    <com.massky.conditioningsystem.view.TransitionView
+        android:id="@+id/ani_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"/>
+</RelativeLayout>

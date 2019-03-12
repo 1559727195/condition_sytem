@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/linear_select"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_content"
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/x6"
+>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center">
+
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:id="@+id/txt_rel"
+            android:paddingRight="@dimen/x5"
+            android:layout_centerInParent="true"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginBottom="@dimen/y3"
+                android:layout_marginLeft="@dimen/x10"
+                android:layout_marginTop="@dimen/y3"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/title_room"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="客厅空调"
+                    android:textColor="#130c0e"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/device_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="开"
+                    android:layout_marginTop="@dimen/y5"
+                    android:textColor="#130c0e"
+                    android:textSize="14sp" />
+
+                <TextView
+
+                    android:id="@+id/status_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="制冷模式|25℃|低风速"
+                    android:textColor="#78cdd1"
+                    android:layout_marginTop="@dimen/y5"
+                    android:textSize="12sp" />
+            </LinearLayout>
+            <CheckBox
+                android:id="@+id/scene_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:gravity="center_vertical"
+                android:paddingBottom="@dimen/x5"
+                android:paddingLeft="@dimen/x8"
+                android:visibility="gone" />
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/scene_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:visibility="gone" />
+    </RelativeLayout>
+</LinearLayout>
