@@ -3,13 +3,13 @@ package com.massky.conditioningsystem.activity;
 import android.Manifest;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.app.Dialog;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,14 +19,18 @@ import com.massky.conditioningsystem.Util.DialogUtil;
 import com.massky.conditioningsystem.Util.EyeUtil;
 import com.massky.conditioningsystem.Util.SharedPreferencesUtil;
 import com.massky.conditioningsystem.Util.ToastUtil;
-import com.massky.conditioningsystem.Utils.DensityUtils;
 import com.massky.conditioningsystem.base.BaseActivity;
+import com.massky.conditioningsystem.base.BasePresenter;
 import com.massky.conditioningsystem.permissions.RxPermissions;
+import com.massky.conditioningsystem.sql.BaseDao;
+import com.massky.conditioningsystem.sql.CommonBean;
+import com.massky.conditioningsystem.sql.DBUtilNew;
 import com.massky.conditioningsystem.view.ClearEditText;
-import com.massky.conditioningsystem.view.ClearLengthEditText;
 import com.massky.conditioningsystem.view.TransitionView;
 import com.yanzhenjie.statusview.StatusUtils;
 import com.yanzhenjie.statusview.StatusView;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.InjectView;
 import io.reactivex.Observer;
@@ -36,7 +40,7 @@ import io.reactivex.disposables.Disposable;
  * Created by zhu on 2017/12/29.
  */
 
-public class LoginCloudActivity extends BaseActivity {
+public class LoginCloudActivity extends BaseActivity<BasePresenter> {
     @InjectView(R.id.status_view)
     StatusView statusView;
     @InjectView(R.id.btn_login_gateway)
@@ -56,6 +60,7 @@ public class LoginCloudActivity extends BaseActivity {
 
     private DialogUtil dialogUtil;
     private String token;
+    private List<CommonBean.userlist> list = new ArrayList<>();
 
     @Override
     protected int viewId() {
@@ -67,6 +72,11 @@ public class LoginCloudActivity extends BaseActivity {
 //        if (!StatusUtils.setStatusBarDarkFont(this, true)) {// Dark font for StatusBar.
 //            statusView.setBackgroundColor(Color.BLACK);
 //        }
+     boolean  loginflag = (boolean) SharedPreferencesUtil.getData(LoginCloudActivity.this,"loginflag",false);
+     if (loginflag) {
+         gotoHomeActivity();
+         return;
+     }
         dialogUtil = new DialogUtil(this);
         StatusUtils.setFullToStatusBar(this);  // StatusBar.
 
@@ -74,14 +84,14 @@ public class LoginCloudActivity extends BaseActivity {
             @Override
             public void onEnd() {
                 //跳转到主页面
-                gotoHomeActivity();
+                mAnimView.setVisibility(View.INVISIBLE);
             }
         });
         search_gateway_btn.setOnClickListener(this);
     }
 
     private void gotoHomeActivity() {
-        startActivity(new Intent(this, HomeActivity.class));
+        startActivity(new Intent(LoginCloudActivity.this, HomeActivity.class));
         finish();
     }
 
@@ -104,6 +114,13 @@ public class LoginCloudActivity extends BaseActivity {
         if (loginPhone != null) {
             usertext_id.setText(loginPhone);
         }
+
+        String localIp = (String) SharedPreferencesUtil.getData(LoginCloudActivity.this, "localIp", "");
+        if (!localIp.equals("")) {
+            DBUtilNew.ip = localIp;
+        } else
+            ToastUtil.showToast(LoginCloudActivity.this,"请设置服务器IP");
+
     }
 
     private void init_permissions() {
@@ -133,20 +150,129 @@ public class LoginCloudActivity extends BaseActivity {
         });
     }
 
+    private void test() {
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+//                String ret = DBUtil.QuerySQL();
+//                Message msg = new Message();
+//                msg.what=1001;
+//                Bundle data = new Bundle();
+//                data.putString("result", ret);
+//                msg.setData(data);
+//                mHandler.sendMessage(msg);
+//                CommonBean.user user = new CommonBean.user();//直接new为查询全部user表中的数据
+////                user.setName("郑波");//插入数据为条件查询全部为郑波的user表数据
+////                user.setUsertype(3);
+//                List< CommonBean.user> list = user.queryList( user);
+////                user.deleteList(user);
+//
+//                //where  and
+//                Map map = new HashMap();
+//                map.put("usertype", 3);//where usertype = 1
+//
+//                //设置成为的类型
+//                user.setUsertype(8);
+//                user.setName("众天力-66");//set name  = 众天力55 where usertype = 1
+//
+////                user.insertList(user);
+//                user.updateList(user, map);
+            }
+        };
+        new Thread(run).start();
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_login_gateway:
+                //登录
+
+                final String username = usertext_id.getText().toString();
+                final String pass = phonepassword.getText().toString();
+
+                if (username.equals("")) {
+                    ToastUtil.showToast(LoginCloudActivity.this, "用户名为空");
+                    return;
+                }
+
+                if (pass.equals("")) {
+                    ToastUtil.showToast(LoginCloudActivity.this, "密码为空");
+                    return;
+                }
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        CommonBean.userlist user = new CommonBean.userlist();//直接new为查询全部user表中的数据
+//                user.setName("郑波");//插入数据为条件查询全部为郑波的user表数据
+//                user.setUsertype(3);
+                        user.setName(username);
+                        user.setPass(pass);
+                        list = user.queryList(user, new BaseDao.onresponse() {
+
+                            @Override
+                            public void onresponse(final String content) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Message message = Message.obtain();
+                                        message.obj = content;
+                                        message.what = 0;
+                                        handler.sendMessage(message);
+                                    }
+                                });
+                            }
+                        });
+                        if (list.size() == 0) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    handler.sendEmptyMessage(1);
+                                }
+                            });
+                        } else {
+                            SharedPreferencesUtil.saveData(LoginCloudActivity.this,"loginflag",true);
+                            SharedPreferencesUtil.saveData(LoginCloudActivity.this,"username",username);
+                            SharedPreferencesUtil.saveData(LoginCloudActivity.this,"pass",pass);
+                            gotoHomeActivity();
+                        }
+                    }
+                }).start();
                 singUp();
                 break;//登录网关
             case R.id.eyeimageview_id_gateway:
                 eyeUtil.EyeStatus();
                 break;
             case R.id.search_gateway_btn:
-                showRenameDialog("", "你好", 0);
+                String localIp = (String) SharedPreferencesUtil.getData(LoginCloudActivity.this, "localIp", "");
+                if (!localIp.equals("")) {
+                    showRenameDialog("", localIp, 0);
+                } else
+                    showRenameDialog("", "127.0.0.1", 0);
                 break;
         }
     }
+
+    int index = 0;
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 0:
+                    index = 1;
+                    ToastUtil.showToast(LoginCloudActivity.this, msg.obj.toString());
+                    break;
+                case 1:
+                    if (index == 1) {
+                        index = 0;
+                    } else {
+                        ToastUtil.showToast(LoginCloudActivity.this, "用户名或密码错误");
+                    }
+                    break;
+            }
+        }
+    };
 
 
     //自定义dialog,自定义重命名dialog
@@ -170,7 +296,7 @@ public class LoginCloudActivity extends BaseActivity {
 //        final TextView content; //内容
         cancel = (ImageView) view.findViewById(R.id.call_cancel);
         confirm = (ImageView) view.findViewById(R.id.call_confirm);
-        final ClearLengthEditText edit_password_gateway = (ClearLengthEditText) view.findViewById(R.id.edit_password_gateway);
+        final ClearEditText edit_password_gateway = (ClearEditText) view.findViewById(R.id.edit_password_gateway);
         edit_password_gateway.setText(name);
         edit_password_gateway.setSelection(edit_password_gateway.getText().length());
 //        tv_title = (TextView) view.findViewById(R.id.tv_title);
@@ -196,6 +322,8 @@ public class LoginCloudActivity extends BaseActivity {
         confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedPreferencesUtil.saveData(LoginCloudActivity.this, "localIp", edit_password_gateway.getText().toString()
+                        .trim());
                 dialog.dismiss();
             }
         });
@@ -203,6 +331,7 @@ public class LoginCloudActivity extends BaseActivity {
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialog.dismiss();
             }
         });
     }
@@ -225,4 +354,8 @@ public class LoginCloudActivity extends BaseActivity {
         animatorSet.start();
     }
 
+    @Override
+    public void showError(String msg) {
+
+    }
 }

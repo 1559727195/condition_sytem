@@ -5,6 +5,10 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+
+import com.massky.conditioningsystem.di.component.AppComponent;
+import com.massky.conditioningsystem.di.component.DaggerAppComponent;
+import com.massky.conditioningsystem.di.module.AppModule;
 import com.zhy.http.okhttp.OkHttpUtils;
 import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
@@ -39,7 +43,7 @@ public class App extends Application implements Application.ActivityLifecycleCal
         _instance = this;
 //        JPushInterface.setDebugMode(true);    // 设置开启日志,发布时请关闭日志
 
-        CrashHandlerUtil.getInstance().init_crash(_instance);
+//        CrashHandlerUtil.getInstance().init_crash(_instance);
 
         //okhttp网络配置
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
@@ -62,6 +66,19 @@ public class App extends Application implements Application.ActivityLifecycleCal
      */
     public static App getInstance() {
         return _instance;
+    }
+
+
+    public AppComponent mAppComponent;
+
+
+    public AppComponent getAppComponent() {
+        if (mAppComponent == null) {
+            mAppComponent = DaggerAppComponent.builder()
+                    .appModule(new AppModule(_instance))
+                    .build();
+        }
+        return mAppComponent;
     }
 
     @Override

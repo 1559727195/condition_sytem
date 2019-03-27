@@ -30,7 +30,7 @@ public class AnimationHelper
 
         AnimatorSet animSet = new AnimatorSet();
         animSet.play(scaleXAnimator).with(scaleYAnimator);
-        animSet.setDuration(500);
+        animSet.setDuration(200);
         animSet.start();
 
         animSet.addListener(endListener);
@@ -46,7 +46,7 @@ public class AnimationHelper
         target.setVisibility(View.VISIBLE);
 
         ObjectAnimator animator = ObjectAnimator.ofFloat(target, "ScaleX", 0, 0.6f, 0.9f, 1.0f);
-        animator.setDuration(1500);
+        animator.setDuration(500);
         animator.setInterpolator(new DecelerateInterpolator());
         target.setPivotX(0);
         animator.start();
@@ -74,7 +74,7 @@ public class AnimationHelper
         AnimatorSet animatorSet = new AnimatorSet();
 
         animatorSet.playTogether(scaleX, scaleY, translationAni, alphaAni);
-        animatorSet.setDuration(2000);
+        animatorSet.setDuration(500);
         animatorSet.start();
 
         animatorSet.addListener(endListener);
@@ -84,7 +84,7 @@ public class AnimationHelper
     {
         success.setVisibility(View.VISIBLE);
 
-        int durationTime = 1000;
+        int durationTime = 200;
 
         int width = success.getMeasuredWidth();
 

@@ -76,13 +76,18 @@ public class HomeDeviceListAdapter extends BaseAdapter {
             viewHolderContentType.title_home_device = (TextView) convertView.findViewById(R.id.title_home_device);
             viewHolderContentType.image_home_device_item = (ImageView) convertView.findViewById(R.id.image_home_device_item);
             viewHolderContentType.linear_item_select = (LinearLayout) convertView.findViewById(R.id.linear_item_select);
+            viewHolderContentType.dev_count = (TextView) convertView.findViewById(R.id.dev_count);
             convertView.setTag(viewHolderContentType);
         } else {
             viewHolderContentType = (ViewHolderContentType) convertView.getTag();
         }
 
-        viewHolderContentType.title_home_device.setText((String) list.get(position).get("name") + "(" +
-                (String) list.get(position).get("count") + ")");
+        if (list.get(position) != null) {
+            viewHolderContentType.title_home_device.setText((String) list.get(position).get("name") == null ? "" :
+                    list.get(position).get("name").toString());
+            viewHolderContentType.dev_count.setText(list.get(position).get("count") == null ? "" :
+                    list.get(position).get("count").toString());
+        }
 
         if (getIsSelected().get(position)) {
 //            viewHolderContentType.img_guan_scene.setImageResource(listintwo.get(position));
@@ -137,6 +142,7 @@ public class HomeDeviceListAdapter extends BaseAdapter {
         ImageView image_home_device_item;
         TextView title_home_device;
         LinearLayout linear_item_select;
+        TextView dev_count;
     }
 
     public interface HomeDeviceItemClickListener {
