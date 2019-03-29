@@ -50,7 +50,7 @@ public class SqlHelper {
             //填坑
             try {
                 if (fields[i].get(o) != null) {
-                    if ("int".equals(type.getName()) && (int) fields[i].get(o) == -1)
+                    if (("int".equals(type.getName()) || "java.lang.Long".equals(type.getName())) && (int) fields[i].get(o) == -1)
                         continue;
                     String fieldName = fields[i].getName();
                     if (fieldName.equals("id")) {

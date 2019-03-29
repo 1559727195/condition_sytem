@@ -31,11 +31,33 @@ public interface HomeContract {
 
     interface View extends IView {
         void showsqlCounts(List<Map> list_dsc_count);
+
         void show_deviceList(List<Map> controller_show_list, List<CommonBean.controller> controller_list);
+
+        void show_sceneList(List<Map> scene_show_list, List<CommonBean.scene> scene_list);
+
+        void show_groupList(List<Map> group_show_list, List<CommonBean.group> group_list);
+
+        void show_operate_max_id(long operate_max_id);
+
+        void show_operateStatus(List<CommonBean.operate> operate_list);
+
+        void show_detailcontrolList(List<CommonBean.GroupDetail> group_detail_list);
     }
 
     interface Presenter extends IPresenter<View> {
-      void  getSqlCounts();
-      void show_deviceList();
+        void getSqlCounts();
+
+        void show_deviceList();
+
+        void show_sceneList();
+
+        void show_controlList();
+
+        void show_control_device(final String sql, final CommonBean.operate operate, final String selectMaxId);
+
+        void show_operateStatus(long operate_max_id);
+
+        void show_detailcontrolList(final int groupId, final String name);
     }
 }

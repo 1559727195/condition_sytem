@@ -9,7 +9,6 @@ import com.massky.conditioningsystem.activity.HomeActivity;
 import com.massky.conditioningsystem.di.module.EntityModule;
 import com.massky.conditioningsystem.sql.BaseDao;
 import com.massky.conditioningsystem.sql.CommonBean;
-import com.massky.conditioningsystem.sql.SqlHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,28 +18,29 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-public class GetDeviceList {
-    @Named(EntityModule.NAME_COMMONBEAN_CONTROLLER)
+public class GetSceneList {
+    @Named(EntityModule.NAME_COMMONBEAN_SCENE)
     @Inject
-    CommonBean.controller controller;
+    CommonBean.scene scene;
     private Activity context;
 
     @Inject
-    public GetDeviceList(Activity context) {
+    public GetSceneList(Activity context) {
         this.context = context;
     }
 
     /**
      * 显示设备列表
      */
-    public void show_deviceList(final Onresponse onresponse) {//
+    public void show_sceneList(final Onresponse onresponse) {//
         this.onresponse = onresponse;
         //去显示选中项设备显示；
         new Thread(new Runnable() {
             @Override
             public void run() {
 
-                List<CommonBean.controller> controller_list = controller.queryList(controller, new BaseDao.onresponse() {
+
+                List<CommonBean.scene> scene_list = scene.queryList(scene, new BaseDao.onresponse() {
 
                     @Override
                     public void onresponse(final String content) {
@@ -55,7 +55,7 @@ public class GetDeviceList {
                         });
                     }
                 });
-                if (controller_list.size() == 0) {
+                if (scene_list.size() == 0) {
                     context.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -63,9 +63,8 @@ public class GetDeviceList {
                             context.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-
-                                    if(!iswifi) {
-                                        ToastUtil.showToast(context, "设备列表为空");
+                                    if (!iswifi) {
+                                        ToastUtil.showToast(context, "场景列表为空");
                                         iswifi = false;
                                     }
                                 }
@@ -73,33 +72,20 @@ public class GetDeviceList {
                         }
                     });
                 } else {
-                    List<Map> controller_show_list = getMaps(controller_list);
-                    onresponse.onresult(controller_show_list, controller_list);
+                    List<Map> scene_show_list = new ArrayList<>();
+                    for (CommonBean.scene scene : scene_list) {
+                        Map map = new HashMap();
+                        map.put("name", scene.name);
+                        map.put("type_item", "场景");
+                        scene_show_list.add(map);
+                    }
+                    onresponse.onresult(scene_show_list, scene_list);
                 }
             }
 
         }).start();
     }
 
-    private List<Map> getMaps(List<CommonBean.controller> controller_list) {
-        List<Map> controller_show_list = new ArrayList<>();
-        for (CommonBean.controller controllers : controller_list) {
-            Map map = new HashMap();
-            map.put("name", controllers.name);
-            map.put("power", controllers.power);
-            map.put("type_item", "设备");
-            switch (controllers.status) {
-                case "在线":
-                    map.put("action", controllers.mode + "|" + controllers.temperatureSet + "℃|" + controllers.wind);
-                    break;
-                case "断线":
-                    map.put("action", "");
-                    break;
-            }
-            controller_show_list.add(map);
-        }
-        return controller_show_list;
-    }
 
     boolean iswifi;
     Handler handler = new Handler() {
@@ -117,7 +103,7 @@ public class GetDeviceList {
     private Onresponse onresponse;
 
     public interface Onresponse {
-        void onresult(List<Map> controller_show_list, List<CommonBean.controller> controller_list);
+        void onresult(List<Map> scene_show_list, List<CommonBean.scene> scene_list);
     }
 
 }

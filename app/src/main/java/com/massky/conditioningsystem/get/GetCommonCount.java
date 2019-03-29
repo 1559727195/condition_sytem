@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Handler;
 import android.os.Message;
 import com.massky.conditioningsystem.Util.ToastUtil;
+import com.massky.conditioningsystem.activity.HomeActivity;
 import com.massky.conditioningsystem.di.module.EntityModule;
 import com.massky.conditioningsystem.sql.BaseDao;
 import com.massky.conditioningsystem.sql.CommonBean;
@@ -29,7 +30,7 @@ public class GetCommonCount {
     /**
      * 连表查询获取设备控制，场景控制，分组控制数据个数
      */
-    public void sqlCounts(final Onresponse onresponse) {//
+    public void sqlCounts(final Onresponse onresponse) {
         this.onresponse = onresponse;
         new Thread(new Runnable() {
             @Override
@@ -48,7 +49,10 @@ public class GetCommonCount {
                     context.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            ToastUtil.showToast(context, "设备，场景，组控列表为空");
+                            if(!iswifi) {
+                                ToastUtil.showToast(context, "设备，场景，组控列表为空");
+                                iswifi = false;
+                            }
                         }
                     });
                 } else {
@@ -77,12 +81,14 @@ public class GetCommonCount {
         }).start();
     }
 
+    boolean iswifi;
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 0:
-
+                    iswifi = true;
+                    ToastUtil.showToast(context, msg.obj.toString());
                     break;
             }
         }

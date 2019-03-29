@@ -20,11 +20,15 @@ import com.massky.conditioningsystem.di.module.EntityModule;
 import com.massky.conditioningsystem.di.scope.ActivityScope;
 import com.massky.conditioningsystem.get.GetCommonCount;
 import com.massky.conditioningsystem.get.GetDeviceList;
+import com.massky.conditioningsystem.get.GetGroupList;
+import com.massky.conditioningsystem.get.GetOperateId;
+import com.massky.conditioningsystem.get.GetSceneList;
 import com.massky.conditioningsystem.presenter.contract.HomeContract;
 import com.massky.conditioningsystem.sql.CommonBean;
 
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Inject;
 
 
@@ -36,13 +40,20 @@ import javax.inject.Inject;
 @ActivityScope
 public class HomePresenter extends BasePresenter<HomeContract.View> implements HomeContract.Presenter {
 
-    private  GetCommonCount getCommonCount;
-    private  GetDeviceList getDeviceList;
+    private GetCommonCount getCommonCount;
+    private GetDeviceList getDeviceList;
+    private GetSceneList getSceneList;
+    private GetGroupList getGroupList;
+    private GetOperateId getOperateId;
 
     @Inject
-    HomePresenter(GetCommonCount getCommonCount, GetDeviceList getDeviceList) {
+    HomePresenter(GetCommonCount getCommonCount, GetDeviceList getDeviceList, GetSceneList getSceneList
+            , GetGroupList getGroupList, GetOperateId getOperateId) {
         this.getCommonCount = getCommonCount;
         this.getDeviceList = getDeviceList;
+        this.getSceneList = getSceneList;
+        this.getGroupList = getGroupList;
+        this.getOperateId = getOperateId;
     }
 
 
@@ -61,7 +72,59 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
         getDeviceList.show_deviceList(new GetDeviceList.Onresponse() {
             @Override
             public void onresult(List<Map> controller_show_list, List<CommonBean.controller> controller_list) {
-                mView.show_deviceList(controller_show_list,controller_list);
+                mView.show_deviceList(controller_show_list, controller_list);
+            }
+        });
+    }
+
+    @Override
+    public void show_sceneList() {
+        getSceneList.show_sceneList(new GetSceneList.Onresponse() {
+
+            @Override
+            public void onresult(List<Map> scene_show_list, List<CommonBean.scene> scene_list) {
+                mView.show_sceneList(scene_show_list, scene_list);
+            }
+        });
+    }
+
+    @Override
+    public void show_controlList() {
+        getGroupList.show_groupList(new GetGroupList.Onresponse() {
+            @Override
+            public void onresult(List<Map> group_show_list, List<CommonBean.group> group_list) {
+                mView.show_groupList(group_show_list, group_list);
+            }
+        });
+    }
+
+    @Override
+    public void show_control_device(String sql, CommonBean.operate operate, String selectMaxId) {
+        getOperateId.show_operateId(new GetOperateId.Onresponse() {
+
+            @Override
+            public void onresult(long operate_max_id) {
+                mView.show_operate_max_id(operate_max_id);
+            }
+        }, sql, operate, selectMaxId);
+    }
+
+    @Override
+    public void show_operateStatus(long operate_max_id) {
+        getOperateId.show_operateStatus(operate_max_id, new GetOperateId.Onresponse_1() {
+            @Override
+            public void onresult(List<CommonBean.operate> operate_list) {
+                mView.show_operateStatus(operate_list);
+            }
+        });
+    }
+
+    @Override
+    public void show_detailcontrolList(int groupId, String name) {
+        getGroupList.show_detailcontrolList(groupId, name, new GetGroupList.Onresponse_1() {
+            @Override
+            public void onresult(List<CommonBean.GroupDetail> group_detail_list) {
+                mView.show_detailcontrolList(group_detail_list);
             }
         });
     }

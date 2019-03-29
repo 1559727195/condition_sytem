@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ import android.widget.TextView;
 
 import com.andview.refreshview.XRefreshView;
 import com.massky.conditioningsystem.R;
+import com.massky.conditioningsystem.Util.DialogUtil;
 import com.massky.conditioningsystem.Util.ListViewForScrollView_New;
 import com.massky.conditioningsystem.Util.RxTimerUtil;
 import com.massky.conditioningsystem.Util.SharedPreferencesUtil;
@@ -43,19 +45,16 @@ import com.massky.conditioningsystem.presenter.contract.HomeContract;
 import com.massky.conditioningsystem.sql.BaseDao;
 import com.massky.conditioningsystem.sql.CommonBean;
 import com.massky.conditioningsystem.sql.SqlHelper;
-import com.massky.conditioningsystem.view.DownLoadProgressbar;
-import com.massky.conditioningsystem.view.ListViewAdaptWidth;
 import com.yanzhenjie.statusview.StatusUtils;
 import com.yanzhenjie.statusview.StatusView;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import butterknife.InjectView;
 
 /**
@@ -76,15 +75,6 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
     private List<Map> deviceList = new ArrayList<>();
     private DetailDeviceHomeAdapter deviceListAdapter;
     private Dialog dialog1;
-
-    //小红点开始坐标
-    Point mCircleStartPoint = new Point();
-    //小红点结束坐标
-    Point mCircleEndPoint = new Point();
-    //小红点控制点坐标
-    Point mCircleConPoint = new Point();
-    //小红点的移动坐标
-    Point mCircleMovePoint = new Point();
     private List<CommonBean.Count> counts = new ArrayList<>();
     private List<Map> list_dsc_count = new ArrayList<>();
     private int intfirst_time;
@@ -97,6 +87,11 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
     private List<CommonBean.GroupDetail> group_detail_list = new ArrayList<>();
     private List<Map> group_show_list = new ArrayList<>();
     private List<CommonBean.operate> operate_list = new ArrayList<>();
+    private int group_list_long_click_position;
+    private long operate_max_id;
+    private Timer timer;
+    private TimerTask timerTask;
+    private DialogUtil dialogUtil;
 
     @Override
     protected int viewId() {
@@ -106,6 +101,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
     @Override
     protected void onView() {
         StatusUtils.setFullToStatusBar(this);  // StatusBar.
+        dialogUtil = new DialogUtil(this);
         refresh_view.setScrollBackDuration(300);
         refresh_view.setPinnedTime(1000);
         refresh_view.setPullLoadEnable(false);
@@ -130,83 +126,6 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
     }
 
 
-
-
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 0:
-                    ToastUtil.showToast(HomeActivity.this, msg.obj.toString());
-                    break;
-                case 3://去显示场景列表
-                    show_scenes();
-                    break;
-                case 4://去显示分组控制列表
-                    show_groups();
-                    break;
-                case 5://去显示分组控制详情列表
-                    showCenterSceneDialog(msg.obj.toString(), "231", null);
-                    break;
-                case 7://根据控制结果，去获取status
-                    get_operate_status_byid((long) msg.obj);
-                    break;
-                case 8://去控制设备之后返回100或101
-                    on_control_scuess();
-                    break;
-
-            }
-        }
-    };
-
-    /**
-     * 通过id获取operate的status
-     *
-     * @param operate_id
-     */
-    private void get_operate_status_byid(final long operate_id) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                CommonBean.operate operate = new CommonBean.operate();
-
-                operate.setId(operate_id);
-                operate_list = operate.queryList(operate, new BaseDao.onresponse() {
-                    @Override
-                    public void onresponse(final String content) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Message message = Message.obtain();
-                                message.obj = content;
-                                message.what = 0;
-                                handler.sendMessage(message);
-                            }
-                        });
-                    }
-                });
-
-                if (operate_list.size() == 0) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ToastUtil.showToast(HomeActivity.this, "控制操作失效");
-                                }
-                            });
-                        }
-                    });
-                } else {//得到控制后的返回值
-                    handler.sendEmptyMessage(8);
-                }
-            }
-        }).start();
-
-    }
-
     /**
      * 控制设备成功或失败
      */
@@ -214,13 +133,15 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
         int status = operate_list.get(0).status;
         switch (status) {
             case 100:
+                time_end();
                 ToastUtil.showToast(HomeActivity.this, "控制成功");
+
                 break;
             case 101:
+                time_end();
                 ToastUtil.showToast(HomeActivity.this, "控制失败");
                 break;
         }
-        excute_delete_control();
 
     }
 
@@ -228,44 +149,14 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
      * 执行删除动作
      */
     private void excute_delete_control() {
-        CommonBean.operate operate = new CommonBean.operate();
-        operate.setId(operate_list.get(0).id);
-        operate.deleteList(operate);
-    }
-
-
-
-
-    /**
-     * 显示分组控制列表
-     */
-    private void show_groups() {
-        group_show_list = new ArrayList<>();
-        for (CommonBean.group group : group_list) {
-            Map map = new HashMap();
-            map.put("name", group.name);
-            map.put("type_item", "分组控制");
-            group_show_list.add(map);
-        }
-//                    mDragGridView.setAdapter(deviceListAdapter);//设备侧栏列表
-        deviceListAdapter.setList(group_show_list);
-        deviceListAdapter.notifyDataSetChanged();
-    }
-
-    /**
-     * 显示场景列表
-     */
-    private void show_scenes() {
-        scene_show_list = new ArrayList<>();
-        for (CommonBean.scene scene : scene_list) {
-            Map map = new HashMap();
-            map.put("name", scene.name);
-            map.put("type_item", "场景");
-            scene_show_list.add(map);
-        }
-//                    mDragGridView.setAdapter(deviceListAdapter);//设备侧栏列表
-        deviceListAdapter.setList(scene_show_list);
-        deviceListAdapter.notifyDataSetChanged();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                CommonBean.operate operate = new CommonBean.operate();
+                operate.setId(operate_list.get(0).id);
+                operate.deleteList(operate);
+            }
+        }).start();
     }
 
     @Override
@@ -292,10 +183,10 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
                 mPresenter.show_deviceList();
                 break;
             case 1:
-                show_sceneList();
+                mPresenter.show_sceneList();
                 break;
             case 2:
-                show_controlList();
+                mPresenter.show_controlList();
                 break;
         }
     }
@@ -430,200 +321,14 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
                 mPresenter.show_deviceList();
                 break;
             case 1:
-                show_sceneList();
+                mPresenter.show_sceneList();
                 break;
             case 2:
-                show_controlList();
+                mPresenter.show_controlList();
                 break;
         }
     }
 
-
-    /**
-     * 显示场景列表
-     */
-    private void show_sceneList() {
-        //去显示选中项设备显示；
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                CommonBean.scene user = new CommonBean.scene();//直接new为查询全部user表中的数据
-
-                scene_list = user.queryList(user, new BaseDao.onresponse() {
-
-                    @Override
-                    public void onresponse(final String content) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Message message = Message.obtain();
-                                message.obj = content;
-                                message.what = 0;
-                                handler.sendMessage(message);
-                            }
-                        });
-                    }
-                });
-                if (scene_list.size() == 0) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ToastUtil.showToast(HomeActivity.this, "场景列表为空");
-                                }
-                            });
-                        }
-                    });
-                } else {
-                    handler.sendEmptyMessage(3);
-                }
-            }
-        }).start();
-    }
-
-    /**
-     * 显示分组控制列表
-     */
-    private void show_controlList() {
-        //去显示选中项设备显示；
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                CommonBean.group user = new CommonBean.group();//直接new为查询全部user表中的数据
-
-                group_list = user.queryList(user, new BaseDao.onresponse() {
-
-                    @Override
-                    public void onresponse(final String content) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Message message = Message.obtain();
-                                message.obj = content;
-                                message.what = 0;
-                                handler.sendMessage(message);
-                            }
-                        });
-                    }
-                });
-                if (group_list.size() == 0) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ToastUtil.showToast(HomeActivity.this, "分组控制列表为空");
-                                }
-                            });
-                        }
-                    });
-                } else {
-                    handler.sendEmptyMessage(4);
-                }
-            }
-        }).start();
-    }
-
-    /**
-     * 提交控制动作
-     */
-    private void show_control_device(final String sql, final CommonBean.operate operate, final String selectMaxId) {
-        //去显示选中项设备显示；
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Object operate_max_id = operate.insertSqlList(operate, sql + selectMaxId, new BaseDao.onresponse() {
-                    @Override
-                    public void onresponse(final String content) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Message message = Message.obtain();
-                                message.obj = content;
-                                message.what = 0;
-                                handler.sendMessage(message);
-                            }
-                        });
-                    }
-                });
-
-                //用operate_max_id去查询status,
-                if (operate_max_id == null) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ToastUtil.showToast(HomeActivity.this, "数据库插入失败");
-                                }
-                            });
-                        }
-                    });
-                } else {
-                    Message message = Message.obtain();
-                    message.obj = Long.valueOf(operate_max_id.toString()).longValue();
-                    message.what = 7;
-                    handler.sendMessage(message);
-                }
-            }
-        }).start();
-    }
-
-    /**
-     * 显示分组控制详情列表
-     */
-    private void show_detailcontrolList(final int groupId, final String name) {
-        //去显示选中项设备显示；
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                CommonBean.GroupDetail user = new CommonBean.GroupDetail();//直接new为查询全部user表中的数据
-
-                group_detail_list = user.querySqlList(user, SqlHelper.sqlgroupLongCLick + groupId + ")", new BaseDao.onresponse() {
-
-                    @Override
-                    public void onresponse(final String content) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Message message = Message.obtain();
-                                message.obj = content;
-                                message.what = 0;
-                                handler.sendMessage(message);
-                            }
-                        });
-                    }
-                });
-                if (group_detail_list.size() == 0) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ToastUtil.showToast(HomeActivity.this, "分组控制详情列表为空");
-                                }
-                            });
-                        }
-                    });
-                } else {
-                    Message message = Message.obtain();
-                    message.obj = name;
-                    message.what = 5;
-                    handler.sendMessage(message);
-                }
-            }
-        }).start();
-    }
 
     /**
      * 缩放动画
@@ -638,68 +343,6 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
         animator.start();
     }
 
-
-    /**
-     * 设置开始点和移动点
-     *
-     * @param x
-     * @param y
-     */
-    public void setCircleStartPoint(int x, int y) {
-        this.mCircleStartPoint.x = x;
-        this.mCircleStartPoint.y = y;
-        this.mCircleMovePoint.x = x;
-        this.mCircleMovePoint.y = y;
-    }
-
-    /**
-     * 设置结束点
-     *
-     * @param x
-     * @param y
-     */
-    public void setCircleEndPoint(int x, int y) {
-        this.mCircleEndPoint.x = x;
-        this.mCircleEndPoint.y = y;
-    }
-
-    /**
-     * 开始动画
-     */
-    public void startAnimation() {
-        if (mCircleStartPoint == null || mCircleEndPoint == null) {
-            return;
-        }
-
-
-        //设置控制点
-        mCircleConPoint.x = ((mCircleStartPoint.x + mCircleEndPoint.x) / 2);
-        mCircleConPoint.y = (20);
-
-        //设置值动画
-        ValueAnimator valueAnimator = ValueAnimator.ofObject(new CirclePointEvaluator(), mCircleStartPoint, mCircleEndPoint);
-        valueAnimator.setDuration(600);
-        valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                Point goodsViewPoint = (Point) animation.getAnimatedValue();
-                mCircleMovePoint.x = goodsViewPoint.x;
-                mCircleMovePoint.y = goodsViewPoint.y;
-//                invalidate();
-            }
-        });
-        valueAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-//                ViewGroup viewGroup = (ViewGroup) getParent();
-//                viewGroup.removeView(GoodsView.this);
-            }
-        });
-        valueAnimator.start();
-
-    }
 
     @Override
     public void showError(String msg) {
@@ -724,13 +367,14 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
 
     /**
      * 显示设备列表
+     *
      * @param controller_show_list
      * @param controller_list
      */
     @Override
     public void show_deviceList(final List<Map> controller_show_list, List<CommonBean.controller> controller_list) {
         this.controller_show_list = controller_show_list;
-        this.controller_list =controller_list;
+        this.controller_list = controller_list;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -740,38 +384,93 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
         });
     }
 
+    /**
+     * 场景显示
+     *
+     * @param scene_show_list
+     * @param scene_list
+     */
+    @Override
+    public void show_sceneList(final List<Map> scene_show_list, List<CommonBean.scene> scene_list) {
+        this.scene_show_list = scene_show_list;
+        this.scene_list = scene_list;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                deviceListAdapter.setList(scene_show_list);
+                deviceListAdapter.notifyDataSetChanged();
+            }
+        });
 
-    public class CirclePointEvaluator implements TypeEvaluator {
+    }
 
-        /**
-         * @param t          当前动画进度
-         * @param startValue 开始值
-         * @param endValue   结束值
-         * @return
-         */
-        @Override
-        public Object evaluate(float t, Object startValue, Object endValue) {
+    /**
+     * 显示分组列表
+     *
+     * @param group_show_list
+     * @param group_list
+     */
+    @Override
+    public void show_groupList(final List<Map> group_show_list, List<CommonBean.group> group_list) {
+        this.group_show_list = group_show_list;
+        this.group_list = group_list;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                deviceListAdapter.setList(group_show_list);
+                deviceListAdapter.notifyDataSetChanged();
+            }
+        });
+    }
 
-            Point startPoint = (Point) startValue;
-            Point endPoint = (Point) endValue;
-            int x = (int) (Math.pow((1 - t), 2) * startPoint.x + 2 * (1 - t) * t * mCircleConPoint.x + Math.pow(t, 2) * endPoint.x);
-            int y = (int) (Math.pow((1 - t), 2) * startPoint.y + 2 * (1 - t) * t * mCircleConPoint.y + Math.pow(t, 2) * endPoint.y);
-            return new Point(x, y);
-        }
+    /**
+     * 控制时获取的最大operateId
+     *
+     * @param operate_max_id
+     */
+    @Override
+    public void show_operate_max_id(long operate_max_id) {
+        //每次控制最多耗时5s,10* 500ms
+        this.operate_max_id = operate_max_id;
+        mPresenter.show_operateStatus(operate_max_id);
+        init_time();
+    }
+
+    /**
+     * 根据maxid获取status
+     *
+     * @param operate_list
+     */
+    @Override
+    public void show_operateStatus(List<CommonBean.operate> operate_list) {
+        this.operate_list = operate_list;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                on_control_scuess();
+            }
+        });
+    }
+
+    /**
+     * 显示组控制长按
+     *
+     * @param group_detail_list
+     */
+    @Override
+    public void show_detailcontrolList(List<CommonBean.GroupDetail> group_detail_list) {
+        this.group_detail_list = group_detail_list;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                showCenterSceneDialog(group_list.get(group_list_long_click_position).name, "", null);
+            }
+        });
     }
 
 
     //自定义dialog,centerDialog删除对话框
     public void showCenterDeleteDialog(final String name1, final String name2, int[] location, final CommonBean.controller controller) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//        // 布局填充器
-//        LayoutInflater inflater = LayoutInflater.from(getActivity());
-//        View view = inflater.inflate(R.layout.user_name_dialog, null);
-//        // 设置自定义的对话框界面
-//        builder.setView(view);
-//
-//        cus_dialog = builder.create();
-//        cus_dialog.show();
 
         View view = LayoutInflater.from(HomeActivity.this).inflate(R.layout.promat_item_pop_dialog, null);
         final TextView tempture_txt = view.findViewById(R.id.tempture_txt); //确定按钮
@@ -825,27 +524,14 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
         temp_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {//温度加
-                if (tempture[0] < 16) {
-                    tempture[0] = 16;
-                }
-                if (tempture[0] < 30)
-                    tempture[0]++;
-                tempture_txt.setText(tempture[0] + "" + "℃");
+                init_temper_Add(tempture, tempture_txt);
 
-                CommonBean.operate operate = new CommonBean.operate();//直接new为查询全部user表中的数据
-                operate.setStatus(1);
-                operate.setFlag(0);
-                operate.setIp(SqlHelper.sqlcontrol_ip + controller.communicatorID + ")");
-                operate.setAddress(controller.address);
-                operate.setPower(controller.power);
-                operate.setTemperatureSet(tempture[0]);//控制温度
-                operate.setMode(controller.mode);
-                operate.setWind(controller.wind);
+                CommonBean.operate operate = init_operate_params(controller, tempture[0]);
                 //提交温度
-                show_control_device(SqlHelper.getString(SqlHelper.sqlcontrol, operate, CommonBean.operate.class), operate, SqlHelper.selectMaxid);//
+                mPresenter.show_control_device(SqlHelper.getString(SqlHelper.sqlcontrol, operate, CommonBean.operate.class), operate, SqlHelper.selectMaxid);
         /*        1. 主键ID 自增 ，插入数据后返回这条数据的ID值
                 insert into tableName() values() select @@identity*/
-
+                dialogUtil.loadDialog();
             }
         });
         temp_del.setOnClickListener(new View.OnClickListener() {//温度减
@@ -856,6 +542,88 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
                 tempture_txt.setText(tempture[0] + "" + "℃");
             }
         });
+    }
+
+    /**
+     * 初始化控制时间
+     */
+    private void init_time() {
+        timer = new Timer();
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                Message message = new Message();
+                message.what = 1;
+                handler.sendMessage(message);
+            }
+        };
+
+        timer.schedule(timerTask, 500, 500);//延时500ms，每隔500毫秒执行一次run方法
+    }
+
+
+    int delaytime;
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 1) {
+                mPresenter.show_operateStatus(operate_max_id);
+                delaytime++;
+                if (delaytime == 10) {
+                    time_end();
+                }
+            }
+            super.handleMessage(msg);
+        }
+    };
+
+
+    private void time_end() {
+        if (timerTask != null) {
+            timerTask.cancel();
+            timer.cancel();
+        }
+        timerTask = null;
+        timer = null;
+        delaytime = 0;
+        dialogUtil.removeDialog();
+        excute_delete_control();
+    }
+
+
+    /**
+     * 初始化温度+
+     *
+     * @param tempture
+     * @param tempture_txt
+     */
+    private void init_temper_Add(int[] tempture, TextView tempture_txt) {
+        if (tempture[0] < 16) {
+            tempture[0] = 16;
+        }
+        if (tempture[0] < 30)
+            tempture[0]++;
+        tempture_txt.setText(tempture[0] + "" + "℃");
+    }
+
+    /**
+     * 初始化operate表控制参数
+     *
+     * @param controller
+     * @param temperatureSet
+     * @return
+     */
+    private CommonBean.operate init_operate_params(CommonBean.controller controller, int temperatureSet) {
+        CommonBean.operate operate = new CommonBean.operate();//直接new为查询全部user表中的数据
+        operate.setStatus(1);
+        operate.setFlag(0);
+        operate.setIp(SqlHelper.sqlcontrol_ip + controller.communicatorID + ")");
+        operate.setAddress(controller.address);
+        operate.setPower(controller.power);
+        operate.setTemperatureSet(temperatureSet);//控制温度
+        operate.setMode(controller.mode);
+        operate.setWind(controller.wind);
+        return operate;
     }
 
 
@@ -903,7 +671,8 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
         switch (current_dsc_position) {
             case 2:
                 //查看分组详情
-                show_detailcontrolList(group_list.get(i).id, group_list.get(i).name);
+                mPresenter.show_detailcontrolList(group_list.get(i).id, group_list.get(i).name);
+                group_list_long_click_position = i;
                 item_click_animal(view);
                 return true;
             default:
@@ -914,7 +683,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        RxTimerUtil.cancel();
+        time_end();
     }
 
     @Override

@@ -6,16 +6,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-
 import com.massky.conditioningsystem.Utils.App;
 import com.massky.conditioningsystem.Utils.AppManager;
 import com.massky.conditioningsystem.di.component.ActivityComponent;
 import com.massky.conditioningsystem.di.component.DaggerActivityComponent;
 import com.massky.conditioningsystem.di.module.ActivityModule;
 import com.massky.conditioningsystem.di.module.EntityModule;
-
 import javax.inject.Inject;
-
 import butterknife.ButterKnife;
 
 /**

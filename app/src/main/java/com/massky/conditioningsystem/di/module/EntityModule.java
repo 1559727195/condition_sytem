@@ -29,7 +29,11 @@ import dagger.Provides;
 public class EntityModule {
 
     public static final String NAME_COMMONBEAN = "CommonBean";
-    public static final String NAME_COMMONBEAN_CONTROLLER = "CommonBean_controller";
+    public static final String NAME_COMMONBEAN_CONTROLLER = "CommonBean_Controller";
+    public static final String NAME_COMMONBEAN_SCENE = "CommonBean_Scene";
+    public static final String NAME_COMMONBEAN_GROUP = "CommonBean_Group";
+    public static final String NAME_COMMONBEAN_OPERATE = "CommonBean_Operate";
+
 
     @Named(NAME_COMMONBEAN)
     @Provides
@@ -42,5 +46,27 @@ public class EntityModule {
     CommonBean.controller providerCommonBeanController() {
         return new CommonBean.controller();
     }
+
+
+    //CommonBean.scene
+    @Named(NAME_COMMONBEAN_SCENE)
+    @Provides
+    CommonBean.scene providerCommonBeanScene() {
+        return new CommonBean.scene();
+    }
+
+    @Named(NAME_COMMONBEAN_GROUP)
+    @Provides
+    CommonBean.group providerCommonBeanGroup() {
+        return new CommonBean.group();
+    }
+
+
+    @Named(NAME_COMMONBEAN_OPERATE)
+    @Provides
+    CommonBean.operate providerCommonBeanOperate() {
+        return new CommonBean.operate();
+    }
+
 
 }
