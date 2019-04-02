@@ -7,25 +7,36 @@ public class SqlHelper {
      * 首页获取：编写连表查询获取设备控制，场景控制，分组控制数据个数
      */
     public static String sqlCount = "   select sum(t.num1) as deviceCount,sum(t.num2) as sceneCount,sum(t.num3) as controlCount from (\n" +
-            "    select count(*) num1,0 as num2,0 as num3 from [CenterControl2].[dbo].[controller]\n" +
+            "    select count(*) num1,0 as num2,0 as num3 from [CenterControl].[dbo].[controller]\n" +
             "  union \n" +
-            "    select 0 as num1,count(*) num2,0 as num3 from [CenterControl2].[dbo].[scene]\n" +
+            "    select 0 as num1,count(*) num2,0 as num3 from [CenterControl].[dbo].[scene]\n" +
             "\tunion \n" +
-            "    select 0 as num1,0 as  num2,count(*) num3 from [CenterControl2].[dbo].[group]\n" +
+            "    select 0 as num1,0 as  num2,count(*) num3 from [CenterControl].[dbo].[group]\n" +
             ") t";
 
 
     /* 长按分组控制sql语句:*/
-    public static String sqlgroupLongCLick = "select control.name from [CenterControl2].[dbo].[controller] control where control.id =ANY\n" +
-            "            (select [controllerID]  from [CenterControl2].[dbo].[groupcontroller]  groupc\n" +
+    public static String sqlgroupLongCLick = "select control.name from [CenterControl].[dbo].[controller] control where control.id =ANY\n" +
+            "            (select [controllerID]  from [CenterControl].[dbo].[groupcontroller]  groupc\n" +
             "                    where groupc.groupID =";//3)";//3为group长按分组的组id,
 
     /**
      * 控制表operate
      */
-    public static String sqlcontrol = "INSERT INTO [CenterControl2].[dbo].[operate] (";
-    public static String sqlcontrol_ip = "(SELECT com.ip FROM [CenterControl2].[dbo].[communicator] as com where com.id =";
+    public static String sqlcontrol = "INSERT INTO [CenterControl].[dbo].[operate] (";
+    public static String sqlcontrol_ip = "(SELECT com.ip FROM [CenterControl].[dbo].[communicator] as com where com.id =";
     public static String selectMaxid= " select SCOPE_IDENTITY() as id";
+
+    /*
+     *场景长按操作
+     */
+    public static String sqlsceneLongCLick_one_air = "select control.id, control.name,control.type,scene.power,scene.temperatureSet,scene.mode,scene.wind from [CenterControl].[dbo].[controller] control,\n" +
+            "[CenterControl].[dbo].[scenecontroller] scene \n" +
+            "where  control.id = ANY\n" +
+            "( select [controllerID]  from [CenterControl].[dbo].[scenecontroller]  scenec \n" +
+            " where scenec.sceneID = ";
+    public static String sqlsceneLongCLick_two = ") and scene.controllerID = control.id  and scene.sceneID =";
+
 
     /**
      * @param o 操作对象

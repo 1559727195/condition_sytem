@@ -36,6 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/y10"
+            android:id="@+id/linear_temp"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -67,6 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/y10"
             android:gravity="center"
+            android:id="@+id/linear_mode"
             android:orientation="horizontal">
 
             <TextView
@@ -99,6 +101,7 @@
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/rel_moshi"
                 android:layout_weight="1">
 
                 <ImageView
@@ -111,6 +114,7 @@
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/rel_fengsu"
                 android:layout_weight="1">
 
                 <ImageView
@@ -123,6 +127,7 @@
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:id="@+id/rel_power"
                 android:layout_weight="1">
 
                 <CheckBox

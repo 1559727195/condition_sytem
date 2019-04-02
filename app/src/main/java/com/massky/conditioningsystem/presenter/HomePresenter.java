@@ -16,7 +16,6 @@
 package com.massky.conditioningsystem.presenter;
 
 import com.massky.conditioningsystem.base.BasePresenter;
-import com.massky.conditioningsystem.di.module.EntityModule;
 import com.massky.conditioningsystem.di.scope.ActivityScope;
 import com.massky.conditioningsystem.get.GetCommonCount;
 import com.massky.conditioningsystem.get.GetDeviceList;
@@ -62,6 +61,7 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
         getCommonCount.sqlCounts(new GetCommonCount.Onresponse() {
             @Override
             public void onresult(List<Map> list) {
+                if(mView != null)
                 mView.showsqlCounts(list);
             }
         });
@@ -125,6 +125,16 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
             @Override
             public void onresult(List<CommonBean.GroupDetail> group_detail_list) {
                 mView.show_detailcontrolList(group_detail_list);
+            }
+        });
+    }
+
+    @Override
+    public void show_scenecontroller(int id) {
+        getSceneList.show_scenecontroller(id, new GetSceneList.Onresponse_1() {
+            @Override
+            public void onresult(List<Map> scene_detail_show_list) {
+                mView.scene_detail_show_list(scene_detail_show_list);
             }
         });
     }

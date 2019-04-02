@@ -43,6 +43,8 @@ public interface HomeContract {
         void show_operateStatus(List<CommonBean.operate> operate_list);
 
         void show_detailcontrolList(List<CommonBean.GroupDetail> group_detail_list);
+
+        void scene_detail_show_list(List<Map> scene_detail_show_list);
     }
 
     interface Presenter extends IPresenter<View> {
@@ -59,5 +61,7 @@ public interface HomeContract {
         void show_operateStatus(long operate_max_id);
 
         void show_detailcontrolList(final int groupId, final String name);
+
+        void show_scenecontroller(int id);
     }
 }

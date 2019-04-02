@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DBUtilNew {
-    private static String db = "CenterControl2";
+    private static String db = "CenterControl";
     public static String ip = "192.168.169.213";
     private static String user = "sa";
     private static String pwd = "";

@@ -64,7 +64,7 @@ public class GetDeviceList {
                                 @Override
                                 public void run() {
 
-                                    if(!iswifi) {
+                                    if (!iswifi) {
                                         ToastUtil.showToast(context, "设备列表为空");
                                         iswifi = false;
                                     }
@@ -88,12 +88,19 @@ public class GetDeviceList {
             map.put("name", controllers.name);
             map.put("power", controllers.power);
             map.put("type_item", "设备");
-            switch (controllers.status) {
-                case "在线":
-                    map.put("action", controllers.mode + "|" + controllers.temperatureSet + "℃|" + controllers.wind);
+            switch (controllers.type) {
+                case "空调":
+                    switch (controllers.power) {
+                        case "打开":
+                            map.put("action", controllers.mode + "|" + controllers.temperatureSet + "℃|" + controllers.wind);
+                            break;
+                        case "关闭":
+                            map.put("action", "");
+                            break;
+                    }
                     break;
-                case "断线":
-                    map.put("action", "");
+                case "新风":
+
                     break;
             }
             controller_show_list.add(map);

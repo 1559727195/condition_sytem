@@ -479,6 +479,54 @@ public class CommonBean {
         public int temperatureSet = -1;
         public String mode;
         public String wind;
+
+        public void setSceneID(int sceneID) {
+            this.sceneID = sceneID;
+        }
+
+        public void setControllerID(int controllerID) {
+            this.controllerID = controllerID;
+        }
+
+        public void setPower(String power) {
+            this.power = power;
+        }
+
+        public void setTemperatureSet(int temperatureSet) {
+            this.temperatureSet = temperatureSet;
+        }
+
+        public void setMode(String mode) {
+            this.mode = mode;
+        }
+
+        public void setWind(String wind) {
+            this.wind = wind;
+        }
+
+        public int getSceneID() {
+            return sceneID;
+        }
+
+        public int getControllerID() {
+            return controllerID;
+        }
+
+        public String getPower() {
+            return power;
+        }
+
+        public int getTemperatureSet() {
+            return temperatureSet;
+        }
+
+        public String getMode() {
+            return mode;
+        }
+
+        public String getWind() {
+            return wind;
+        }
     }
 
     /*    控制操作表结构定义
@@ -628,6 +676,77 @@ public class CommonBean {
         public int getControlCount() {
             return controlCount;
         }
+    }
+
+
+    /**
+     * 场景长按动作查询表
+     */
+    public static class sceneDetail extends BaseDao<sceneDetail> implements Serializable {
+        public int id = -1;
+        public String name;
+        public String type;
+        public String power;
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public void setPower(String power) {
+            this.power = power;
+        }
+
+        public void setTemperatureSet(int temperatureSet) {
+            this.temperatureSet = temperatureSet;
+        }
+
+        public void setMode(String mode) {
+            this.mode = mode;
+        }
+
+        public void setWind(String wind) {
+            this.wind = wind;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public String getPower() {
+            return power;
+        }
+
+        public int getTemperatureSet() {
+            return temperatureSet;
+        }
+
+        public String getMode() {
+            return mode;
+        }
+
+        public String getWind() {
+            return wind;
+        }
+
+        public int temperatureSet = -1;
+        public String mode;
+        public String wind;
     }
 
 

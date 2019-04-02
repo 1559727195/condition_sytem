@@ -83,6 +83,7 @@
                 android:paddingBottom="@dimen/y8"
                 android:textColor="#a7a7a7"
                 android:textColorHint="#a7a7a7"
+                android:imeOptions="flagNoExtractUi"
                 app:layout_widthPercent="70%" />
 
             <!--<TextView-->
@@ -139,6 +140,7 @@
                 android:paddingBottom="@dimen/y8"
                 android:textColor="#a7a7a7"
                 android:textColorHint="#a7a7a7"
+                android:imeOptions="flagNoExtractUi"
                 app:layout_widthPercent="70%" />
 
             <ImageView

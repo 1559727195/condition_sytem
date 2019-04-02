@@ -52,16 +52,18 @@
         </RelativeLayout>
 
 
-        <!--<ImageView-->
-        <!--android:id="@+id/add_device"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:layout_centerVertical="true"-->
-        <!--android:layout_marginTop="8dp"-->
-        <!--android:layout_marginRight="@dimen/x8"-->
-        <!--android:paddingLeft="@dimen/x8"-->
-        <!--app:srcCompat="@drawable/icon_plus" />-->
+        <TextView
+            android:id="@+id/login_out"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/x10"
+            android:paddingLeft="@dimen/x10"
+            android:text="退出登录"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
     </RelativeLayout>
 
     <LinearLayout
@@ -77,26 +79,27 @@
             android:orientation="vertical">
 
 
-                    <LinearLayout
-                        android:id="@+id/layout_sort1"
-                        android:layout_width="fill_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="left"
-                        android:background="@color/dark_main"
-                        android:gravity="left"
-                        android:orientation="vertical">
-                        <ListView
-                            android:id="@+id/home_listview"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/y10"
-                            android:choiceMode="singleChoice"
-                            android:divider="@null">
+            <LinearLayout
+                android:id="@+id/layout_sort1"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="left"
+                android:background="@color/dark_main"
+                android:gravity="left"
+                android:orientation="vertical">
 
-                        </ListView>
+                <ListView
+                    android:id="@+id/home_listview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/y10"
+                    android:choiceMode="singleChoice"
+                    android:divider="@null">
+
+                </ListView>
 
 
-                    </LinearLayout>
+            </LinearLayout>
 
         </LinearLayout>
 

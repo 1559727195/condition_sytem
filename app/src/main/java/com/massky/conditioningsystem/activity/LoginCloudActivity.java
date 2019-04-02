@@ -31,7 +31,6 @@ import com.yanzhenjie.statusview.StatusUtils;
 import com.yanzhenjie.statusview.StatusView;
 import java.util.ArrayList;
 import java.util.List;
-
 import butterknife.InjectView;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
