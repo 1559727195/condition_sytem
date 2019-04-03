@@ -53,45 +53,47 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
         this.getOperateId = getOperateId;
     }
 
-
     @Override
     public void getSqlCounts() {
         getCommonCount.sqlCounts(new GetCommonCount.Onresponse() {
             @Override
             public void onresult(List<Map> list) {
-                if(mView != null)
-                mView.showsqlCounts(list);
+                if (mView != null)
+                    mView.showsqlCounts(list);
             }
         });
     }
 
     @Override
     public void show_deviceList(String trim) {
-        getDeviceList.show_deviceList(trim,new GetDeviceList.Onresponse() {
+        getDeviceList.show_deviceList(trim, new GetDeviceList.Onresponse() {
             @Override
             public void onresult(List<Map> controller_show_list, List<CommonBean.controller> controller_list) {
-                mView.show_deviceList(controller_show_list, controller_list);
+                if (mView != null)
+                    mView.show_deviceList(controller_show_list, controller_list);
             }
         });
     }
 
     @Override
     public void show_sceneList(String trim) {
-        getSceneList.show_sceneList(trim,new GetSceneList.Onresponse() {
+        getSceneList.show_sceneList(trim, new GetSceneList.Onresponse() {
 
             @Override
             public void onresult(List<Map> scene_show_list, List<CommonBean.scene> scene_list) {
-                mView.show_sceneList(scene_show_list, scene_list);
+                if (mView != null)
+                    mView.show_sceneList(scene_show_list, scene_list);
             }
         });
     }
 
     @Override
     public void show_controlList(String trim) {
-        getGroupList.show_groupList(trim,new GetGroupList.Onresponse() {
+        getGroupList.show_groupList(trim, new GetGroupList.Onresponse() {
             @Override
             public void onresult(List<Map> group_show_list, List<CommonBean.group> group_list) {
-                mView.show_groupList(group_show_list, group_list);
+                if (mView != null)
+                    mView.show_groupList(group_show_list, group_list);
             }
         });
     }

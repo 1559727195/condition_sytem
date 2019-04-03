@@ -43,39 +43,47 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/y30"
-        android:layout_marginTop="@dimen/y5"
+        android:layout_marginTop="@dimen/y10"
         android:padding="@dimen/x5"
+        android:layout_marginBottom="@dimen/y5"
         android:orientation="horizontal">
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.5"
-            android:layout_marginRight="@dimen/x2"
-           >
-            <ImageView
+            android:layout_weight="0.45"
+            android:layout_marginLeft="@dimen/x5"
+            android:background="@drawable/dialog_text_corner_bg">
+            <TextView
                 android:id="@+id/call_cancel"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_alignParentRight="true"
-                android:src="@drawable/btn_quxiao"
-              />
+                android:gravity="center"
+                android:layout_centerInParent="true"
+                android:text="是"
+                android:textColor="#000000"
+                android:textSize="16dp" />
         </RelativeLayout>
 
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.1" />
 
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.5"
-            android:layout_marginLeft="@dimen/x2"
-            >
-            <ImageView
-                android:id="@+id/call_confirm"
-                android:layout_width="wrap_content"
+            android:layout_weight="0.45"
+            android:layout_marginRight="@dimen/x5"
+            android:background="@drawable/dialog_text_corner_bg">
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:id="@+id/call_confirm"
                 android:gravity="center"
-                android:layout_alignParentLeft="true"
-                android:src="@drawable/btn_baocun"
-                />
+                android:text="否"
+                android:layout_centerInParent="true"
+                android:textColor="#000000"
+                android:textSize="16dp" />
         </RelativeLayout>
     </LinearLayout>
 </LinearLayout>

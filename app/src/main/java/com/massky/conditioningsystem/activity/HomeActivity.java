@@ -1277,12 +1277,12 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
 
 
         final View view = LayoutInflater.from(HomeActivity.this).inflate(R.layout.edit_search_dialog, null);
-        final ImageView confirm; //确定按钮
-        ImageView cancel; //确定按钮
-        ImageView tv_title;
+        final TextView confirm; //确定按钮
+        TextView cancel; //确定按钮
+        TextView tv_title;
 //        final TextView content; //内容
-        cancel = (ImageView) view.findViewById(R.id.call_cancel);
-        confirm = (ImageView) view.findViewById(R.id.call_confirm);
+        cancel = (TextView) view.findViewById(R.id.call_cancel);
+        confirm = (TextView) view.findViewById(R.id.call_confirm);
         final ClearEditText edit_password_gateway = (ClearEditText) view.findViewById(R.id.edit_password_gateway);
         edit_password_gateway.setText(name);
         edit_password_gateway.setSelection(edit_password_gateway.getText().length());
@@ -1307,12 +1307,6 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
         confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (edit_password_gateway.getText().toString().trim().equals("")) {
-                    ToastUtil.showToast(HomeActivity.this, "查询条件为空");
-                    return;
-                }
-                fuzzy_query = SqlHelper.sqlencode(edit_password_gateway.getText().toString().trim());
-                get_list(fuzzy_query);
                 dialog.dismiss();
             }
         });
@@ -1320,6 +1314,12 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (edit_password_gateway.getText().toString().trim().equals("")) {
+                    ToastUtil.showToast(HomeActivity.this, "查询条件为空");
+                    return;
+                }
+                fuzzy_query = SqlHelper.sqlencode(edit_password_gateway.getText().toString().trim());
+                get_list(fuzzy_query);
                 dialog.dismiss();
             }
         });
