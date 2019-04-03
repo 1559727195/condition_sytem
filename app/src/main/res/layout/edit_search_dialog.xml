@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:text="请输入服务器的IP地址"
+        android:text="请输入查询条件"
         android:gravity="center"
         android:textColor="#000000"
         android:textSize="14sp"/>

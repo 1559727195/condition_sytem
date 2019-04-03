@@ -25,7 +25,7 @@ public class SqlHelper {
      */
     public static String sqlcontrol = "INSERT INTO [CenterControl].[dbo].[operate] (";
     public static String sqlcontrol_ip = "(SELECT com.ip FROM [CenterControl].[dbo].[communicator] as com where com.id =";
-    public static String selectMaxid= " select SCOPE_IDENTITY() as id";
+    public static String selectMaxid = " select SCOPE_IDENTITY() as id";
 
     /*
      *场景长按操作
@@ -36,6 +36,12 @@ public class SqlHelper {
             "( select [controllerID]  from [CenterControl].[dbo].[scenecontroller]  scenec \n" +
             " where scenec.sceneID = ";
     public static String sqlsceneLongCLick_two = ") and scene.controllerID = control.id  and scene.sceneID =";
+
+    public static String sqlcontorller_mohu = "select * from [CenterControl].[dbo].[controller]  where name like ";//213%'
+    public static String sqlscene_mohu = "select * from [CenterControl].[dbo].[scene]  where name like ";
+    public static String sqlgroup_mohu = "select * from [CenterControl].[dbo].[group]  where name like ";
+
+    public  static String sqlorderby = " order by control.name";//分组
 
 
     /**
@@ -107,5 +113,18 @@ public class SqlHelper {
     wind = 中风,
     $change = null,
     serialVersionUID = -4349780701152742047,*/
+
+    /**
+     * 模糊查询语句
+     *
+     * @param str
+     * @return
+     */
+
+    public static String sqlencode(String str) {
+        return str.replace("[", "[[]")//'此句一定要在最前
+                .replace("_", "[_]")
+                .replace("%", "[%]");
+    }
 
 }

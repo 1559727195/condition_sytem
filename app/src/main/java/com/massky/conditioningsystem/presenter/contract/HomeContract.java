@@ -50,11 +50,11 @@ public interface HomeContract {
     interface Presenter extends IPresenter<View> {
         void getSqlCounts();
 
-        void show_deviceList();
+        void show_deviceList(String trim);
 
-        void show_sceneList();
+        void show_sceneList(String trim);
 
-        void show_controlList();
+        void show_controlList(String trim);
 
         void show_control_device(final String sql, final CommonBean.operate operate, final String selectMaxId);
 

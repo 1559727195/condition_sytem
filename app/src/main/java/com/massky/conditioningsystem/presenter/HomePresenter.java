@@ -24,10 +24,8 @@ import com.massky.conditioningsystem.get.GetOperateId;
 import com.massky.conditioningsystem.get.GetSceneList;
 import com.massky.conditioningsystem.presenter.contract.HomeContract;
 import com.massky.conditioningsystem.sql.CommonBean;
-
 import java.util.List;
 import java.util.Map;
-
 import javax.inject.Inject;
 
 
@@ -68,8 +66,8 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
     }
 
     @Override
-    public void show_deviceList() {
-        getDeviceList.show_deviceList(new GetDeviceList.Onresponse() {
+    public void show_deviceList(String trim) {
+        getDeviceList.show_deviceList(trim,new GetDeviceList.Onresponse() {
             @Override
             public void onresult(List<Map> controller_show_list, List<CommonBean.controller> controller_list) {
                 mView.show_deviceList(controller_show_list, controller_list);
@@ -78,8 +76,8 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
     }
 
     @Override
-    public void show_sceneList() {
-        getSceneList.show_sceneList(new GetSceneList.Onresponse() {
+    public void show_sceneList(String trim) {
+        getSceneList.show_sceneList(trim,new GetSceneList.Onresponse() {
 
             @Override
             public void onresult(List<Map> scene_show_list, List<CommonBean.scene> scene_list) {
@@ -89,8 +87,8 @@ public class HomePresenter extends BasePresenter<HomeContract.View> implements H
     }
 
     @Override
-    public void show_controlList() {
-        getGroupList.show_groupList(new GetGroupList.Onresponse() {
+    public void show_controlList(String trim) {
+        getGroupList.show_groupList(trim,new GetGroupList.Onresponse() {
             @Override
             public void onresult(List<Map> group_show_list, List<CommonBean.group> group_list) {
                 mView.show_groupList(group_show_list, group_list);

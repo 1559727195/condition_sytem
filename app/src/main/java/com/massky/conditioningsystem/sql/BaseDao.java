@@ -123,7 +123,7 @@ public class BaseDao<T> {
         try {
             conn = DBUtilNew.getConn(onresponse);
             ps = conn.prepareStatement(sql);
-            ResultSet rs =   ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 object = rs.getObject(1);
             }
@@ -340,9 +340,10 @@ public class BaseDao<T> {
     //获取查询的sql语句
     public String getQuerySql(T t) {
         String sql = "select * from " + "[" + clazz.getSimpleName() + "]";
-        sql = get_common_sql(t, sql);
+        sql = get_common_sql(t, sql) + " order by name";
         return sql;
     }
+
 
     //获取查询的sql语句
     public String getDeleteSql(T t) {

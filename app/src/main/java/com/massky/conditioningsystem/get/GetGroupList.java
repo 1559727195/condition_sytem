@@ -3,21 +3,20 @@ package com.massky.conditioningsystem.get;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Message;
-
 import com.massky.conditioningsystem.Util.ToastUtil;
 import com.massky.conditioningsystem.activity.HomeActivity;
 import com.massky.conditioningsystem.di.module.EntityModule;
 import com.massky.conditioningsystem.sql.BaseDao;
 import com.massky.conditioningsystem.sql.CommonBean;
 import com.massky.conditioningsystem.sql.SqlHelper;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import static com.massky.conditioningsystem.sql.SqlHelper.sqlorderby;
 
 public class GetGroupList {
     @Named(EntityModule.NAME_COMMONBEAN_GROUP)
@@ -33,28 +32,50 @@ public class GetGroupList {
     /**
      * 显示设备列表
      */
-    public void show_groupList(final Onresponse onresponse) {//
+    public void show_groupList(final String trim, final Onresponse onresponse) {//
         this.onresponse = onresponse;
         //去显示选中项设备显示；
         new Thread(new Runnable() {
             @Override
             public void run() {
+                List<CommonBean.group> group_list = new ArrayList<>();
+                switch (trim) {
+                    default:
+                        group_list = group.querySqlList(group, SqlHelper.sqlgroup_mohu + "'%" + trim + "%'", new BaseDao.onresponse() {
 
-                List<CommonBean.group> group_list = group.queryList(group, new BaseDao.onresponse() {
-
-                    @Override
-                    public void onresponse(final String content) {
-                        context.runOnUiThread(new Runnable() {
                             @Override
-                            public void run() {
-                                Message message = Message.obtain();
-                                message.obj = content;
-                                message.what = 0;
-                                handler.sendMessage(message);
+                            public void onresponse(final String content) {
+                                context.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Message message = Message.obtain();
+                                        message.obj = content;
+                                        message.what = 0;
+                                        handler.sendMessage(message);
+                                    }
+                                });
                             }
                         });
-                    }
-                });
+                        break;
+                    case "":
+                        group_list = group.queryList(group, new BaseDao.onresponse() {
+
+                            @Override
+                            public void onresponse(final String content) {
+                                context.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Message message = Message.obtain();
+                                        message.obj = content;
+                                        message.what = 0;
+                                        handler.sendMessage(message);
+                                    }
+                                });
+                            }
+                        });
+                        break;
+                }
+
                 if (group_list.size() == 0) {
                     context.runOnUiThread(new Runnable() {
                         @Override
@@ -110,7 +131,8 @@ public class GetGroupList {
             public void run() {
 
                 CommonBean.GroupDetail user = new CommonBean.GroupDetail();//直接new为查询全部user表中的数据
-                List<CommonBean.GroupDetail> group_detail_list = user.querySqlList(user, SqlHelper.sqlgroupLongCLick + groupId + ")", new BaseDao.onresponse() {
+                List<CommonBean.GroupDetail> group_detail_list = user.querySqlList(user, SqlHelper.sqlgroupLongCLick + groupId + ")"
+                        + sqlorderby, new BaseDao.onresponse() {
 
                     @Override
                     public void onresponse(final String content) {

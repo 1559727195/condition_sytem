@@ -19,10 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.andview.refreshview.XRefreshView;
 import com.massky.conditioningsystem.R;
-import com.massky.conditioningsystem.Util.DataCleanManager;
 import com.massky.conditioningsystem.Util.DialogUtil;
 import com.massky.conditioningsystem.Util.ListViewForScrollView_New;
 import com.massky.conditioningsystem.Util.SharedPreferencesUtil;
@@ -36,18 +34,17 @@ import com.massky.conditioningsystem.presenter.HomePresenter;
 import com.massky.conditioningsystem.presenter.contract.HomeContract;
 import com.massky.conditioningsystem.sql.CommonBean;
 import com.massky.conditioningsystem.sql.SqlHelper;
+import com.massky.conditioningsystem.view.ClearEditText;
 import com.massky.conditioningsystem.view.CommomDialog;
 import com.massky.conditioningsystem.view.SceneDialog;
 import com.yanzhenjie.statusview.StatusUtils;
 import com.yanzhenjie.statusview.StatusView;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import butterknife.InjectView;
 
 /**
@@ -67,6 +64,8 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
     XRefreshView refresh_view;
     @InjectView(R.id.login_out)
     TextView login_out;
+    @InjectView(R.id.search_txt)
+    TextView search_txt;
     private List<Map> deviceList = new ArrayList<>();
     private DetailDeviceHomeAdapter deviceListAdapter;
     private Dialog dialog1;
@@ -90,6 +89,8 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
     private boolean popcheck_init;
     private int scene_list_long_click_position;
     private View view_long_click;
+    private int item_click_position;
+    private String fuzzy_query = "";
 
     @Override
     protected int viewId() {
@@ -108,6 +109,9 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
             public void onRefresh(boolean isPullDown) {
                 super.onRefresh(isPullDown);
                 refresh_view.stopRefresh();
+                mPresenter.getSqlCounts();
+                fuzzy_query = "";
+                get_list(fuzzy_query);
             }
 
             @Override
@@ -121,6 +125,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
     @Override
     protected void onEvent() {
         login_out.setOnClickListener(this);
+        search_txt.setOnClickListener(this);
         init_device_onclick();
     }
 
@@ -130,15 +135,61 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
      */
     private void on_control_scuess() {
         int status = operate_list.get(0).status;
-        switch (status) {
-            case 100:
-                time_end();
-                ToastUtil.showToast(HomeActivity.this, "控制成功");
-
+        switch (current_dsc_position) {
+            case 0://设备控制
+                refreh_control_scuress(status);
                 break;
-            case 101:
-                time_end();
-                ToastUtil.showToast(HomeActivity.this, "控制失败");
+            default:
+                switch (status) {
+                    case 100:
+                        time_end();
+                        ToastUtil.showToast(HomeActivity.this, "控制成功");
+
+                        break;
+                    case 101:
+                        time_end();
+                        ToastUtil.showToast(HomeActivity.this, "控制失败");
+                        break;
+                }
+                break;
+        }
+    }
+
+    /**
+     * 空调新风控制成功返回
+     *
+     * @param status
+     */
+    private void refreh_control_scuress(int status) {
+        switch (controller_list.get(item_click_position).getType() == null ? "" : controller_list.get(item_click_position).getType()) {
+            case "空调":
+                switch (status) {
+                    case 100:
+                        time_end();
+                        ToastUtil.showToast(HomeActivity.this, "控制成功");
+                        break;
+                    case 101:
+                        time_end();
+                        ToastUtil.showToast(HomeActivity.this, "控制失败");
+                        break;
+                }
+                break;
+            case "新风":
+                switch (status) {
+                    case 100:
+                        time_end();
+                        ToastUtil.showToast(HomeActivity.this, controller_list.get(item_click_position).getPower() == null ? "控制"
+                                : controller_list.get(item_click_position).getPower() +
+                                "成功");
+
+                        break;
+                    case 101:
+                        time_end();
+                        ToastUtil.showToast(HomeActivity.this, controller_list.get(item_click_position).getPower() == null ? "控制"
+                                : controller_list.get(item_click_position).getPower() +
+                                "失败");
+                        break;
+                }
                 break;
         }
     }
@@ -171,6 +222,9 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
         switch (view.getId()) {
             case R.id.login_out:
                 showCenterDeleteDialog("是否退出登录?");
+                break;
+            case R.id.search_txt://模糊查询
+                showSearchDialog("");
                 break;
         }
     }
@@ -250,22 +304,22 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
             current_dsc_position = 0;
         }
         mPresenter.getSqlCounts();
-        get_list();
+        get_list(fuzzy_query);
     }
 
     /**
      * 获取首页设备列表
      */
-    private void get_list() {
+    private void get_list(String name) {
         switch (current_dsc_position) {
             case 0:
-                mPresenter.show_deviceList();
+                mPresenter.show_deviceList(name);
                 break;
             case 1:
-                mPresenter.show_sceneList();
+                mPresenter.show_sceneList(name);
                 break;
             case 2:
-                mPresenter.show_controlList();
+                mPresenter.show_controlList(name);
                 break;
         }
     }
@@ -282,6 +336,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
                 int[] location = new int[2];
                 view.getLocationInWindow(location); //获取在当前窗口内的绝对坐标
                 view.getLocationOnScreen(location);//获取在整个屏幕内的绝对坐标
+                item_click_position = position;
                 switch (current_dsc_position) {
                     case 0:
                         air_refresh_control(position, location);
@@ -301,6 +356,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
 
     /**
      * 新风空调设备控制
+     *
      * @param position
      * @param location
      */
@@ -422,8 +478,18 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
 
         for (int i = 0; i < 3; i++) {
             Map map = new HashMap();
-            map.put("name", "设备控制");
-            map.put("count", "" + i);
+            map.put("count", "0");
+            switch (i) {
+                case 0:
+                    map.put("name", "设备控制");
+                    break;
+                case 1:
+                    map.put("name", "场景控制");
+                    break;
+                case 2:
+                    map.put("name", "分组控制");
+                    break;
+            }
             roomList.add(map);
         }
         homeDeviceListAdapter = new HomeDeviceListAdapter(HomeActivity.this, roomList, new HomeDeviceListAdapter.HomeDeviceItemClickListener() {
@@ -450,7 +516,8 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
             }
         }
         homeDeviceListAdapter.notifyDataSetChanged();
-        get_list();
+        fuzzy_query = "";
+        get_list(fuzzy_query);
     }
 
 
@@ -554,7 +621,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
     public void show_operate_max_id(long operate_max_id) {
         //每次控制最多耗时5s,10* 500ms
         this.operate_max_id = operate_max_id;
-        mPresenter.show_operateStatus(operate_max_id);
+//        mPresenter.show_operateStatus(operate_max_id);
         init_time();
     }
 
@@ -572,7 +639,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
                 on_control_scuess();
             }
         });
-        get_list();//控制完后重新获取设备列表
+        get_list(fuzzy_query);//控制完后重新获取设备列表
     }
 
     /**
@@ -909,7 +976,6 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
         } else {
             ToastUtil.showToast(HomeActivity.this, "请先打开空调");
         }
-
         speed_txt.setText(wind[0]);
     }
 
@@ -926,7 +992,6 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
                 insert into tableName() values() select @@identity*/
         dialogUtil.loadDialog();
     }
-
 
     /**
      * 初始化控制时间
@@ -1194,5 +1259,69 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
         /*        1. 主键ID 自增 ，插入数据后返回这条数据的ID值
                 insert into tableName() values() select @@identity*/
         dialogUtil.loadDialog();
+    }
+
+
+    //自定义dialog,模糊查询
+
+    public void showSearchDialog(final String name) {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//        // 布局填充器
+//        LayoutInflater inflater = LayoutInflater.from(getActivity());
+//        View view = inflater.inflate(R.layout.user_name_dialog, null);
+//        // 设置自定义的对话框界面
+//        builder.setView(view);
+//
+//        cus_dialog = builder.create();
+//        cus_dialog.show();
+
+
+        final View view = LayoutInflater.from(HomeActivity.this).inflate(R.layout.edit_search_dialog, null);
+        final ImageView confirm; //确定按钮
+        ImageView cancel; //确定按钮
+        ImageView tv_title;
+//        final TextView content; //内容
+        cancel = (ImageView) view.findViewById(R.id.call_cancel);
+        confirm = (ImageView) view.findViewById(R.id.call_confirm);
+        final ClearEditText edit_password_gateway = (ClearEditText) view.findViewById(R.id.edit_password_gateway);
+        edit_password_gateway.setText(name);
+        edit_password_gateway.setSelection(edit_password_gateway.getText().length());
+//        tv_title = (TextView) view.findViewById(R.id.tv_title);
+//        tv_title.setText("是否拨打119");
+//        content.setText(message);
+        //显示数据
+        final Dialog dialog = new Dialog(HomeActivity.this, R.style.BottomDialog);
+        dialog.setContentView(view);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        int displayWidth = dm.widthPixels;
+        int displayHeight = dm.heightPixels;
+        android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes(); //获取对话框当前的参数值
+        p.width = (int) (displayHeight / 3 * 2); //宽度设置为屏幕的0.5
+        p.height = (int) (p.width / 2); //宽度设置为屏幕的0.5
+//        dialog.setCanceledOnTouchOutside(false);// 设置点击屏幕Dialog不消失
+        dialog.getWindow().setAttributes(p);  //设置生效
+        dialog.show();
+
+
+        confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (edit_password_gateway.getText().toString().trim().equals("")) {
+                    ToastUtil.showToast(HomeActivity.this, "查询条件为空");
+                    return;
+                }
+                fuzzy_query = SqlHelper.sqlencode(edit_password_gateway.getText().toString().trim());
+                get_list(fuzzy_query);
+                dialog.dismiss();
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
     }
 }

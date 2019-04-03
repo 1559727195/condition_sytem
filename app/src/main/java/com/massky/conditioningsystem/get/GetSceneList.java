@@ -19,6 +19,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import static com.massky.conditioningsystem.sql.SqlHelper.sqlorderby;
+
 public class GetSceneList {
     @Named(EntityModule.NAME_COMMONBEAN_SCENE)
     @Inject
@@ -33,29 +35,53 @@ public class GetSceneList {
     /**
      * 显示设备列表
      */
-    public void show_sceneList(final Onresponse onresponse) {//
+    public void show_sceneList(final String trim, final Onresponse onresponse) {//
         this.onresponse = onresponse;
+
         //去显示选中项设备显示；
         new Thread(new Runnable() {
+            List<CommonBean.scene> scene_list = new ArrayList<>();
+
             @Override
             public void run() {
+                switch (trim) {
+                    default:
+                        scene_list = scene.querySqlList(scene, SqlHelper.sqlscene_mohu + "'%" + trim + "%'", new BaseDao.onresponse() {
 
-
-                List<CommonBean.scene> scene_list = scene.queryList(scene, new BaseDao.onresponse() {
-
-                    @Override
-                    public void onresponse(final String content) {
-                        context.runOnUiThread(new Runnable() {
                             @Override
-                            public void run() {
-                                Message message = Message.obtain();
-                                message.obj = content;
-                                message.what = 0;
-                                handler.sendMessage(message);
+                            public void onresponse(final String content) {
+                                context.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Message message = Message.obtain();
+                                        message.obj = content;
+                                        message.what = 0;
+                                        handler.sendMessage(message);
+                                    }
+                                });
                             }
                         });
-                    }
-                });
+                        break;
+                    case "":
+                        scene_list = scene.queryList(scene, new BaseDao.onresponse() {
+
+                            @Override
+                            public void onresponse(final String content) {
+                                context.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Message message = Message.obtain();
+                                        message.obj = content;
+                                        message.what = 0;
+                                        handler.sendMessage(message);
+                                    }
+                                });
+                            }
+                        });
+                        break;
+                }
+
+
                 if (scene_list.size() == 0) {
                     context.runOnUiThread(new Runnable() {
                         @Override
@@ -113,11 +139,11 @@ public class GetSceneList {
             @Override
             public void run() {
                 List<CommonBean.sceneDetail> scene_detail_list = sceneDetail.querySqlList(sceneDetail,
-                        SqlHelper.sqlsceneLongCLick_one_air + id + SqlHelper.sqlsceneLongCLick_two + id, new BaseDao.onresponse() {
+                        SqlHelper.sqlsceneLongCLick_one_air + id + SqlHelper.sqlsceneLongCLick_two + id + sqlorderby, new BaseDao.onresponse() {
 
                             @Override
                             public void onresponse(final String content) {
-                                context.runOnUiThread(new Runnable() {
+                                context.runOnUiThread(new Runnable() {//order by control.name->排序
                                     @Override
                                     public void run() {
                                         Message message = Message.obtain();

@@ -126,12 +126,11 @@ public class GetOperateId {
                     context.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
                             context.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     if (!iswifi) {
-                                        ToastUtil.showToast(context, "控制操作失效");
+//                                        ToastUtil.showToast(context, "控制操作失效");
                                         iswifi = false;
                                     }
                                 }
