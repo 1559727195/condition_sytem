@@ -113,13 +113,18 @@ public class LoginCloudActivity extends BaseActivity<BasePresenter> {
         if (loginPhone != null) {
             usertext_id.setText(loginPhone);
         }
+        init_ip();
 
+    }
+
+    private void init_ip() {
         String localIp = (String) SharedPreferencesUtil.getData(LoginCloudActivity.this, "localIp", "");
         if (!localIp.equals("")) {
             DBUtilNew.ip = localIp;
-        } else
-            ToastUtil.showToast(LoginCloudActivity.this,"请设置服务器IP");
-
+        } else {
+            ToastUtil.showToast(LoginCloudActivity.this, "请设置服务器IP");
+            return;
+        }
     }
 
     private void init_permissions() {
@@ -189,7 +194,7 @@ public class LoginCloudActivity extends BaseActivity<BasePresenter> {
 
                 final String username = usertext_id.getText().toString();
                 final String pass = phonepassword.getText().toString();
-
+                init_ip();
                 if (username.equals("")) {
                     ToastUtil.showToast(LoginCloudActivity.this, "用户名为空");
                     return;

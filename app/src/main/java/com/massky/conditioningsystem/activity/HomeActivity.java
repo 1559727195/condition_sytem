@@ -33,6 +33,7 @@ import com.massky.conditioningsystem.di.module.EntityModule;
 import com.massky.conditioningsystem.presenter.HomePresenter;
 import com.massky.conditioningsystem.presenter.contract.HomeContract;
 import com.massky.conditioningsystem.sql.CommonBean;
+import com.massky.conditioningsystem.sql.DBUtilNew;
 import com.massky.conditioningsystem.sql.SqlHelper;
 import com.massky.conditioningsystem.view.ClearEditText;
 import com.massky.conditioningsystem.view.CommomDialog;
@@ -129,7 +130,6 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
         init_device_onclick();
     }
 
-
     /**
      * 控制设备成功或失败
      */
@@ -213,6 +213,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
 
     @Override
     protected void onData() {
+        init_ip();
         room_list_show_adapter();
         device_list_show_adapter();
     }
@@ -292,9 +293,22 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements Adapter
         HomeActivity.this.finish();
         startActivity(new Intent(HomeActivity.this, LoginCloudActivity.class));
         SharedPreferencesUtil.saveData(HomeActivity.this, "loginflag", false);
+
         SharedPreferencesUtil.saveData(HomeActivity.this, "username", "");
         SharedPreferencesUtil.saveData(HomeActivity.this, "pass", "");
+        SharedPreferencesUtil.saveData(HomeActivity.this, "localIp", "");
     }
+
+    private void init_ip() {
+        String localIp = (String) SharedPreferencesUtil.getData(HomeActivity.this, "localIp", "");
+        if (!localIp.equals("")) {
+            DBUtilNew.ip = localIp;
+        } else {
+            ToastUtil.showToast(HomeActivity.this, "请设置服务器IP");
+            return;
+        }
+    }
+
 
     @Override
     protected void onResume() {
